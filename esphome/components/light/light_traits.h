@@ -26,6 +26,8 @@ class LightTraits {
   }
   float get_min_mireds() const { return this->min_mireds_; }
   void set_min_mireds(float min_mireds) { this->min_mireds_ = min_mireds; }
+  float get_middle_mireds() const { return this->middle_mireds_; }
+  void set_middle_mireds(float middle_mireds) { this->middle_mireds_ = middle_mireds; }  
   float get_max_mireds() const { return this->max_mireds_; }
   void set_max_mireds(float max_mireds) { this->max_mireds_ = max_mireds; }
 
@@ -35,6 +37,7 @@ class LightTraits {
   bool supports_rgb_white_value_{false};
   bool supports_color_temperature_{false};
   float min_mireds_{0};
+  float middle_mireds_{0};
   float max_mireds_{0};
   bool supports_color_interlock_{false};
 };

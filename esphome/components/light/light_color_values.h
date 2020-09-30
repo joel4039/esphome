@@ -230,6 +230,35 @@ class LightColorValues {
     }
   }
 
+      /// Convert these light color values to an WWA representation with the given parameters.
+  void as_wwa(float color_temperature_cw, float color_temperature_ww, float color_temperature_amber, float *cold_white,
+               float *warm_white, float *amber, float gamma = 0, bool constant_brightness = false) const {
+    const float color_temp = clamp(this->color_temperature_, color_temperature_cw, color_temperature_ww);
+    if (color_temp > = color_temperature_ww){
+      const float ww_fraction = (color_temp - color_temperature_cw) / (color_temperature_ww - color_temperature_cw);
+      const float cw_fraction = 1.0f - ww_fraction;
+      const float white_level = gamma_correct(this->state_ * this->brightness_ * this->white_, gamma);
+      *cold_white = white_level * cw_fraction;
+      *warm_white = white_level * ww_fraction;
+      if (!constant_brightness) {
+        const float max_cw_ww = std::max(ww_fraction, cw_fraction);
+        *cold_white /= max_cw_ww;
+        *warm_white /= max_cw_ww;
+      }
+    } else{
+      const float amber_fraction = (color_temp - color_temperature_ww) / (color_temperature_amber - color_temperature_2w);
+      const float ww_fraction = 1.0f - ww_fraction;
+      const float white_level = gamma_correct(this->state_ * this->brightness_ * this->white_, gamma);
+      *amber = white_level * amber_fraction;
+      *warm_white = white_level * ww_fraction;
+      if (!constant_brightness) {
+        const float max_ww_amber = std::max(amber_fraction, ww_fraction);
+        *warm_white /= max_ww_amber;
+        *amber /= max_ww_amber;
+      }
+    }
+  }
+
   /// Compare this LightColorValues to rhs, return true if and only if all attributes match.
   bool operator==(const LightColorValues &rhs) const {
     return state_ == rhs.state_ && brightness_ == rhs.brightness_ && red_ == rhs.red_ && green_ == rhs.green_ &&
